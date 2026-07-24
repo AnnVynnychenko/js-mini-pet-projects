@@ -1,6 +1,7 @@
 import { wins } from './data-wins.js';
 
 const container = document.querySelector('.js-content');
+console.log(container);
 const tableScore = document.querySelector('.js-score');
 const winner = document.querySelector('.js-winner');
 const resetScoreBtn = document.querySelector('.js-reset-score');
@@ -23,6 +24,31 @@ function createMarkupGameField() {
 
 createMarkupGameField();
 
+function loadStateGame() {
+  try {
+    const savedHistoryX = JSON.parse(localStorage.getItem('historyX')) || [];
+    const savedHistoryO = JSON.parse(localStorage.getItem('historyO')) || [];
+    const savedPlayer = localStorage.getItem('player') || 'X';
+
+    historyX = savedHistoryX;
+    historyO = savedHistoryO;
+    player = savedPlayer;
+
+    historyX.forEach(id => {
+      const item = container.querySelector(`[data-id='${id}']`);
+      if (item) item.textContent = 'X';
+    });
+    historyO.forEach(id => {
+      const item = container.querySelector(`[data-id='${id}']`);
+      if (item) item.textContent = 'O';
+    });
+  } catch (parseError) {
+    console.error('Parsing error:', parseError.message);
+  }
+}
+
+loadStateGame();
+
 function updateScore(scorePlayerX, scorePlayerO) {
   const markupTableScore = ` <tr>
               <td class='player-data'>Player X</td>
@@ -44,13 +70,18 @@ function onClick(evt) {
 
   let result = false;
   const id = Number(target.dataset.id);
-
-  if (player === 'X') {
-    historyX.push(id);
-    result = isWinner(historyX);
-  } else {
-    historyO.push(id);
-    result = isWinner(historyO);
+  try {
+    if (player === 'X') {
+      historyX.push(id);
+      localStorage.setItem('historyX', JSON.stringify(historyX));
+      result = isWinner(historyX);
+    } else {
+      historyO.push(id);
+      localStorage.setItem('historyO', JSON.stringify(historyO));
+      result = isWinner(historyO);
+    }
+  } catch (parseError) {
+    console.error('Parsing error:', parseError.message);
   }
 
   target.textContent = player;
@@ -69,8 +100,9 @@ function onClick(evt) {
       scorePlayerO += 1;
       updateScore(scorePlayerX, scorePlayerO);
     }
+    const winningPlayer = player;
     setTimeout(() => {
-      resetGame();
+      resetGame(winningPlayer);
     }, 500);
     return;
   } else if (isEndGame) {
@@ -78,27 +110,34 @@ function onClick(evt) {
     setTimeout(() => {
       winner.textContent = '';
     }, 2000);
+    const nextPlayer = player === 'X' ? 'O' : 'X';
     setTimeout(() => {
-      resetGame();
+      resetGame(nextPlayer);
     }, 500);
     return;
   }
 
   player = player === 'X' ? 'O' : 'X';
+  localStorage.setItem('player', player);
 }
 
 function resetHandler() {
   scorePlayerX = 0;
   scorePlayerO = 0;
   updateScore(scorePlayerX, scorePlayerO);
+  resetGame('X');
 }
 
 function isWinner(arr) {
   return wins.some(item => item.every(id => arr.includes(id)));
 }
 
-function resetGame() {
+function resetGame(nextFirstPlayer) {
   createMarkupGameField();
   historyX = [];
   historyO = [];
+  player = nextFirstPlayer || player || 'X';
+  localStorage.removeItem('historyX');
+  localStorage.removeItem('historyO');
+  localStorage.setItem('player', player);
 }
