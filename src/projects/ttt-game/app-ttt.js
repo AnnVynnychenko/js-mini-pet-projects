@@ -1,7 +1,6 @@
 import { wins } from './data-wins.js';
 
 const container = document.querySelector('.js-content');
-console.log(container);
 const tableScore = document.querySelector('.js-score');
 const winner = document.querySelector('.js-winner');
 const resetScoreBtn = document.querySelector('.js-reset-score');
@@ -29,10 +28,14 @@ function loadStateGame() {
     const savedHistoryX = JSON.parse(localStorage.getItem('historyX')) || [];
     const savedHistoryO = JSON.parse(localStorage.getItem('historyO')) || [];
     const savedPlayer = localStorage.getItem('player') || 'X';
+    const savedScorePlayerX = Number(localStorage.getItem('scorePlayerX')) || 0;
+    const savedScorePlayerO = Number(localStorage.getItem('scorePlayerO')) || 0;
 
     historyX = savedHistoryX;
     historyO = savedHistoryO;
     player = savedPlayer;
+    scorePlayerX = savedScorePlayerX;
+    scorePlayerO = savedScorePlayerO;
 
     historyX.forEach(id => {
       const item = container.querySelector(`[data-id='${id}']`);
@@ -70,18 +73,15 @@ function onClick(evt) {
 
   let result = false;
   const id = Number(target.dataset.id);
-  try {
-    if (player === 'X') {
-      historyX.push(id);
-      localStorage.setItem('historyX', JSON.stringify(historyX));
-      result = isWinner(historyX);
-    } else {
-      historyO.push(id);
-      localStorage.setItem('historyO', JSON.stringify(historyO));
-      result = isWinner(historyO);
-    }
-  } catch (parseError) {
-    console.error('Parsing error:', parseError.message);
+
+  if (player === 'X') {
+    historyX.push(id);
+    localStorage.setItem('historyX', JSON.stringify(historyX));
+    result = isWinner(historyX);
+  } else {
+    historyO.push(id);
+    localStorage.setItem('historyO', JSON.stringify(historyO));
+    result = isWinner(historyO);
   }
 
   target.textContent = player;
@@ -95,9 +95,11 @@ function onClick(evt) {
     }, 2000);
     if (player === 'X') {
       scorePlayerX += 1;
+      localStorage.setItem('scorePlayerX', scorePlayerX);
       updateScore(scorePlayerX, scorePlayerO);
     } else {
       scorePlayerO += 1;
+      localStorage.setItem('scorePlayerO', scorePlayerO);
       updateScore(scorePlayerX, scorePlayerO);
     }
     const winningPlayer = player;
@@ -124,6 +126,8 @@ function onClick(evt) {
 function resetHandler() {
   scorePlayerX = 0;
   scorePlayerO = 0;
+  localStorage.removeItem('scorePlayerX');
+  localStorage.removeItem('scorePlayerO');
   updateScore(scorePlayerX, scorePlayerO);
   resetGame('X');
 }
