@@ -5,6 +5,9 @@ const tableScore = document.querySelector('.js-score');
 const winner = document.querySelector('.js-winner');
 const resetScoreBtn = document.querySelector('.js-reset-score');
 
+let textTimeoutId = null;
+let resetTimeoutId = null;
+
 container.addEventListener('click', onClick);
 resetScoreBtn.addEventListener('click', resetHandler);
 let player = 'X';
@@ -90,7 +93,7 @@ function onClick(evt) {
 
   if (result) {
     winner.textContent = `Winner ${player} 😎🎉🎊`;
-    setTimeout(() => {
+    textTimeoutId = setTimeout(() => {
       winner.textContent = '';
     }, 2000);
     if (player === 'X') {
@@ -103,17 +106,17 @@ function onClick(evt) {
       updateScore(scorePlayerX, scorePlayerO);
     }
     const winningPlayer = player;
-    setTimeout(() => {
+    resetTimeoutId = setTimeout(() => {
       resetGame(winningPlayer);
     }, 500);
     return;
   } else if (isEndGame) {
     winner.textContent = `Friendship prevailed`;
-    setTimeout(() => {
+    textTimeoutId = setTimeout(() => {
       winner.textContent = '';
     }, 2000);
     const nextPlayer = player === 'X' ? 'O' : 'X';
-    setTimeout(() => {
+    resetTimeoutId = setTimeout(() => {
       resetGame(nextPlayer);
     }, 500);
     return;
@@ -124,6 +127,9 @@ function onClick(evt) {
 }
 
 function resetHandler() {
+  clearTimeout(textTimeoutId);
+  clearTimeout(resetTimeoutId);
+  winner.textContent = '';
   scorePlayerX = 0;
   scorePlayerO = 0;
   localStorage.removeItem('scorePlayerX');
