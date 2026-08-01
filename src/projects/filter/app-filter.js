@@ -20,28 +20,51 @@ function validateFields(data, conditions) {
   return true;
 }
 
+function parseJSON(text) {
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    throw new Error(
+      'Invalid JSON syntax! Please check your brackets or quotes.'
+    );
+  }
+}
+
+function getRawDataText() {
+  if (jsonOutput.value.trim() === '' || isInputChanged) {
+    return jsonInput.value.trim();
+  } else {
+    return jsonOutput.value.trim();
+  }
+}
+
+async function fetchPreset(presetKey) {
+  const url = new URL(`./presets/${presetKey}.json`, import.meta.url);
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('File not found');
+  return await response.json();
+}
+
+function displayData(presetKey, preset) {
+  if (presetKey === 'user-data') {
+    const rawData = preset.data || preset;
+    jsonInput.value = JSON.stringify(rawData, null, 2);
+    isInputChanged = true;
+  } else {
+    const rawConditions = preset.condition || preset;
+    conditions.value = JSON.stringify(rawConditions, null, 2);
+  }
+}
+
 async function handleClickPresets(event) {
   if (!event.target.classList.contains('preset-btn')) {
     return;
   }
   const presetKey = event.target.dataset.preset;
+
   try {
-    const url = new URL(`./presets/${presetKey}.json`, import.meta.url);
-
-    const response = await fetch(url);
-
-    if (!response.ok) throw new Error('File not found');
-
-    const preset = await response.json();
-
-    if (presetKey === 'user-data') {
-      const rawData = preset.data || preset;
-      jsonInput.value = JSON.stringify(rawData, null, 2);
-      isInputChanged = true;
-    } else {
-      const rawConditions = preset.condition || preset;
-      conditions.value = JSON.stringify(rawConditions, null, 2);
-    }
+    const preset = await fetchPreset(presetKey);
+    displayData(presetKey, preset);
   } catch (error) {
     console.error('Error loading preset:', error.message);
     alert(`Could not load preset file: ${presetKey}.json`);
@@ -51,67 +74,46 @@ async function handleClickPresets(event) {
 function handleSubmit(event) {
   event.preventDefault();
 
-  let rawDataText = '';
-
-  if (jsonOutput.value.trim() === '' || isInputChanged) {
-    rawDataText = jsonInput.value.trim();
-  } else {
-    rawDataText = jsonOutput.value.trim();
-  }
-
-  const rawConditionsText = conditions.value.trim();
-
-  let userData = {};
+  let userData = [];
   let conditionsObj = {};
+
+  const rawDataText = getRawDataText();
+  const rawConditionsText = conditions.value.trim();
 
   if (!validateFields(rawDataText, rawConditionsText)) {
     return;
   }
 
   try {
-    userData = JSON.parse(rawDataText);
-    conditionsObj = JSON.parse(rawConditionsText);
-  } catch (parseError) {
-    console.error('Parsing error:', parseError.message);
-    alert(
-      'Invalid JSON syntax! Please check your brackets, commas, or quotes.'
-    );
-    return;
-  }
+    userData = parseJSON(rawDataText);
+    conditionsObj = parseJSON(rawConditionsText);
 
-  try {
-    const conditionsBody = conditionsObj;
-
-    let currentResult = [...userData];
-
-    if (!Array.isArray(currentResult)) {
+    if (!Array.isArray(userData)) {
       throw new Error('Data must be an array');
     }
 
-    if (conditionsBody.include) {
-      const conditionFilter = conditionsBody.include;
-      currentResult = filterByCondition(currentResult, conditionFilter);
+    let currentResult = [...userData];
+
+    if (conditionsObj.include) {
+      currentResult = filterByCondition(currentResult, conditionsObj.include);
     }
 
-    if (conditionsBody.excludeOR) {
-      const conditionExcludeOr = conditionsBody.excludeOR;
-      currentResult = excludeOrByKeys(currentResult, conditionExcludeOr);
+    if (conditionsObj.excludeOR) {
+      currentResult = excludeOrByKeys(currentResult, conditionsObj.excludeOR);
     }
 
-    if (conditionsBody.excludeAND) {
-      const conditionExcludeAnd = conditionsBody.excludeAND;
-      currentResult = excludeAnd(currentResult, conditionExcludeAnd);
+    if (conditionsObj.excludeAND) {
+      currentResult = excludeAnd(currentResult, conditionsObj.excludeAND);
     }
 
-    if (conditionsBody.sortBy) {
-      const conditionSortBy = conditionsBody.sortBy;
-      currentResult = sortByCondition(currentResult, conditionSortBy);
+    if (conditionsObj.sortBy) {
+      currentResult = sortByCondition(currentResult, conditionsObj.sortBy);
     }
 
     jsonOutput.value = JSON.stringify(currentResult, null, 2);
     isInputChanged = false;
   } catch (validationError) {
-    console.error('Validation error:', validationError.message);
+    console.error('Error:', validationError.message);
     alert(validationError.message);
   }
 }
