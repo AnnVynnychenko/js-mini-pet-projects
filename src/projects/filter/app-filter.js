@@ -56,6 +56,27 @@ function displayData(presetKey, preset) {
   }
 }
 
+const RULE_ARR = [
+  { key: 'include', fn: filterByCondition },
+  { key: 'excludeOR', fn: excludeOrByKeys },
+  { key: 'excludeAND', fn: excludeAnd },
+  { key: 'sortBy', fn: sortByCondition },
+];
+
+function processData(userData, conditionsObj) {
+  if (!Array.isArray(userData)) {
+    throw new Error('Data must be an array');
+  }
+
+  let currentData = [...userData];
+
+  return RULE_ARR.reduce((prevValue, el) => {
+    return conditionsObj[el.key]
+      ? (prevValue = el.fn(prevValue, conditionsObj[el.key]))
+      : prevValue;
+  }, currentData);
+}
+
 async function handleClickPresets(event) {
   if (!event.target.classList.contains('preset-btn')) {
     return;
@@ -88,27 +109,7 @@ function handleSubmit(event) {
     userData = parseJSON(rawDataText);
     conditionsObj = parseJSON(rawConditionsText);
 
-    if (!Array.isArray(userData)) {
-      throw new Error('Data must be an array');
-    }
-
-    let currentResult = [...userData];
-
-    if (conditionsObj.include) {
-      currentResult = filterByCondition(currentResult, conditionsObj.include);
-    }
-
-    if (conditionsObj.excludeOR) {
-      currentResult = excludeOrByKeys(currentResult, conditionsObj.excludeOR);
-    }
-
-    if (conditionsObj.excludeAND) {
-      currentResult = excludeAnd(currentResult, conditionsObj.excludeAND);
-    }
-
-    if (conditionsObj.sortBy) {
-      currentResult = sortByCondition(currentResult, conditionsObj.sortBy);
-    }
+    const currentResult = processData(userData, conditionsObj);
 
     jsonOutput.value = JSON.stringify(currentResult, null, 2);
     isInputChanged = false;
