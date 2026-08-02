@@ -8,8 +8,6 @@ const resetScoreBtn = document.querySelector('.js-reset-score');
 let textTimeoutId = null;
 let resetTimeoutId = null;
 
-container.addEventListener('click', onClick);
-resetScoreBtn.addEventListener('click', resetHandler);
 let player = 'X';
 let historyX = [];
 let historyO = [];
@@ -24,39 +22,8 @@ function createMarkupGameField() {
   container.innerHTML = markup;
 }
 
-createMarkupGameField();
-
-function loadStateGame() {
-  try {
-    const savedHistoryX = JSON.parse(localStorage.getItem('historyX')) || [];
-    const savedHistoryO = JSON.parse(localStorage.getItem('historyO')) || [];
-    const savedPlayer = localStorage.getItem('player') || 'X';
-    const savedScorePlayerX = Number(localStorage.getItem('scorePlayerX')) || 0;
-    const savedScorePlayerO = Number(localStorage.getItem('scorePlayerO')) || 0;
-
-    historyX = savedHistoryX;
-    historyO = savedHistoryO;
-    player = savedPlayer;
-    scorePlayerX = savedScorePlayerX;
-    scorePlayerO = savedScorePlayerO;
-
-    historyX.forEach(id => {
-      const item = container.querySelector(`[data-id='${id}']`);
-      if (item) item.textContent = 'X';
-    });
-    historyO.forEach(id => {
-      const item = container.querySelector(`[data-id='${id}']`);
-      if (item) item.textContent = 'O';
-    });
-  } catch (parseError) {
-    console.error('Parsing error:', parseError.message);
-  }
-}
-
-loadStateGame();
-
 function updateScore(scorePlayerX, scorePlayerO) {
-  const markupTableScore = ` <tr>
+  tableScore.innerHTML = ` <tr>
               <td class='player-data'>Player X</td>
               <td class=' player-data score'>${scorePlayerX}</td>
             </tr>
@@ -64,11 +31,55 @@ function updateScore(scorePlayerX, scorePlayerO) {
               <td class='player-data'>Player O</td>
               <td class='player-data score'>${scorePlayerO}</td>
             </tr>`;
-
-  tableScore.innerHTML = markupTableScore;
 }
 
-updateScore(scorePlayerX, scorePlayerO);
+function renderSymbol(id, symbol) {
+  const item = container.querySelector(`[data-id='${id}']`);
+  if (item) item.textContent = symbol;
+}
+
+function isWinner(arr) {
+  return wins.some(item => item.every(id => arr.includes(id)));
+}
+
+function incrementScore(player) {
+  if (player === 'X') {
+    scorePlayerX += 1;
+    localStorage.setItem('scorePlayerX', scorePlayerX);
+  } else {
+    scorePlayerO += 1;
+    localStorage.setItem('scorePlayerO', scorePlayerO);
+  }
+  updateScore(scorePlayerX, scorePlayerO);
+}
+
+function handleEndGameText(gameResult, message) {
+  gameResult.textContent = message;
+  textTimeoutId = setTimeout(() => {
+    gameResult.textContent = '';
+  }, 2000);
+}
+
+function resetGameTime(playerType) {
+  resetTimeoutId = setTimeout(() => {
+    resetGame(playerType);
+  }, 500);
+}
+
+function loadStateGame() {
+  try {
+    historyX = JSON.parse(localStorage.getItem('historyX')) || [];
+    historyO = JSON.parse(localStorage.getItem('historyO')) || [];
+    player = localStorage.getItem('player') || 'X';
+    scorePlayerX = Number(localStorage.getItem('scorePlayerX')) || 0;
+    scorePlayerO = Number(localStorage.getItem('scorePlayerO')) || 0;
+
+    historyX.forEach(id => renderSymbol(id, 'X'));
+    historyO.forEach(id => renderSymbol(id, 'O'));
+  } catch (parseError) {
+    console.error('Parsing error:', parseError.message);
+  }
+}
 
 function onClick(evt) {
   const { target } = evt;
@@ -92,33 +103,16 @@ function onClick(evt) {
   const isEndGame = historyX.length + historyO.length === 9;
 
   if (result) {
-    winner.textContent = `Winner ${player} 😎🎉🎊`;
-    textTimeoutId = setTimeout(() => {
-      winner.textContent = '';
-    }, 2000);
-    if (player === 'X') {
-      scorePlayerX += 1;
-      localStorage.setItem('scorePlayerX', scorePlayerX);
-      updateScore(scorePlayerX, scorePlayerO);
-    } else {
-      scorePlayerO += 1;
-      localStorage.setItem('scorePlayerO', scorePlayerO);
-      updateScore(scorePlayerX, scorePlayerO);
-    }
+    handleEndGameText(winner, `Winner ${player} 😎🎉🎊`);
+    incrementScore(player);
     const winningPlayer = player;
-    resetTimeoutId = setTimeout(() => {
-      resetGame(winningPlayer);
-    }, 500);
+    resetGameTime(winningPlayer);
     return;
-  } else if (isEndGame) {
-    winner.textContent = `Friendship prevailed`;
-    textTimeoutId = setTimeout(() => {
-      winner.textContent = '';
-    }, 2000);
+  }
+  if (isEndGame) {
+    handleEndGameText(winner, `Friendship prevailed`);
     const nextPlayer = player === 'X' ? 'O' : 'X';
-    resetTimeoutId = setTimeout(() => {
-      resetGame(nextPlayer);
-    }, 500);
+    resetGameTime(nextPlayer);
     return;
   }
 
@@ -138,10 +132,6 @@ function resetHandler() {
   resetGame('X');
 }
 
-function isWinner(arr) {
-  return wins.some(item => item.every(id => arr.includes(id)));
-}
-
 function resetGame(nextFirstPlayer) {
   createMarkupGameField();
   historyX = [];
@@ -151,3 +141,10 @@ function resetGame(nextFirstPlayer) {
   localStorage.removeItem('historyO');
   localStorage.setItem('player', player);
 }
+
+createMarkupGameField();
+loadStateGame();
+updateScore(scorePlayerX, scorePlayerO);
+
+container.addEventListener('click', onClick);
+resetScoreBtn.addEventListener('click', resetHandler);
