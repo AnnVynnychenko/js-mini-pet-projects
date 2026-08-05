@@ -21,5 +21,5 @@ export default defineConfig({
     },
   },
 
-  base: '/js-mini-projects/',
+  base: '/js-mini-pet-projects/',
 });
