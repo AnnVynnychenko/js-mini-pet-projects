@@ -11,9 +11,14 @@ mini-applications built with Vite.
 
 ## 📂 Project Structure
 
+## 📂 Project Structure
+
 - `src/index.html` — Main dashboard / Navigation hub.
 - `src/projects/converter/` — Distance Converter (Metric/Imperial via JSON
   configuration).
+- `src/projects/filter/` — Data filtering, sorting, and JSON parsing.
+- `src/projects/ttt-game/` — Tic-Tac-Toe web game with match history saved and
+  restored via `localStorage`.git
 
 ## 🛠️ Getting Started
 
