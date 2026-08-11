@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_WEATHER_BASE_URL;
+const BASE_URL = 'https://api.weatherapi.com/v1';
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 
 const searchForm = document.querySelector('.js-search-form');
