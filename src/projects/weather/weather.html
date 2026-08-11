@@ -12,7 +12,21 @@
       <header>
         <h1 class="project-name">Weather Forecast</h1>
       </header>
-      <main></main>
+      <main>
+        <form class="js-search-form">
+          <input
+            type="text"
+            name="cityName"
+            placeholder="Enter a city (for example, Prague)"
+            required
+          />
+          <button type="submit">Search</button>
+          <select
+            class="js-forecast-days-container"
+            name="forecastDays"
+          ></select>
+        </form>
+      </main>
     </div>
     <script type="module" src="./app-weather.js"></script>
   </body>
