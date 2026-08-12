@@ -17,7 +17,7 @@
           <input
             type="text"
             name="cityName"
-            placeholder="Enter a city (for example, Prague)"
+            placeholder="Enter city name in English (for example, Prague)"
             required
           />
           <button type="submit">Search</button>
@@ -26,6 +26,11 @@
             name="forecastDays"
           ></select>
         </form>
+        <section class="current-city-weather">
+          <div></div>
+          <ul class="js-city-forecast"></ul>
+        </section>
+        <section class="favorites-cities"></section>
       </main>
     </div>
     <script type="module" src="./app-weather.js"></script>

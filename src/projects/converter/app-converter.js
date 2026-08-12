@@ -19,7 +19,7 @@ function calculateConversion(convertedData, fromUnit, toUnit) {
 
 function handleSubmit(event) {
   event.preventDefault();
-  const form = event.target;
+  const form = event.currentTarget;
   const formData = new FormData(form);
   const fromUnit = formData.get('fromUnit');
   const toUnit = formData.get('toUnit');

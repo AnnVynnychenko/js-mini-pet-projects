@@ -5,8 +5,33 @@ const searchForm = document.querySelector('.js-search-form');
 const forecastDaysContainer = document.querySelector(
   '.js-forecast-days-container'
 );
+const cityForecast = document.querySelector('.js-city-forecast');
 
-function createMarkupForecastDays() {
+function createMarkupCurrentCityForecast(data) {
+  return data
+    .map(
+      ({
+        date,
+        day: {
+          avgtemp_c,
+          condition: { text, icon },
+          avghumidity,
+        },
+      }) => `<li>
+      <img src="${icon}" alt="${text}" />
+      <p>${text}</p>
+      <h2>${date}</h2>
+      <h3>Average temperature</h3>
+      <p>${avgtemp_c}</p>
+      <h3>Average humidity</h3>
+      <p>${avghumidity}</p>
+      </li>`
+    )
+    .slice(1)
+    .join('');
+}
+
+function createMarkupDays() {
   let markup = '';
   for (let i = 1; i <= 14; i += 1) {
     markup += `<option data-id="${i}">${i}</option>`;
@@ -14,12 +39,14 @@ function createMarkupForecastDays() {
   forecastDaysContainer.innerHTML = markup;
 }
 
-createMarkupForecastDays();
+createMarkupDays();
 
-function handleSubmit(event) {
+function handleSearch(event) {
   event.preventDefault();
-  const enteredCity = event.target.elements.cityName.value.trim().toLowerCase();
-  const enteredDays = event.target.elements.forecastDays.value.trim();
+  const enteredCity = event.currentTarget.elements.cityName.value
+    .trim()
+    .toLowerCase();
+  const enteredDays = event.currentTarget.elements.forecastDays.value.trim();
   getWeather(enteredCity, enteredDays);
 }
 
@@ -32,10 +59,12 @@ async function getWeather(enteredCity, enteredDays) {
       throw new Error(response.statusText);
     }
     const data = await response.json();
-    console.log(data);
+    cityForecast.innerHTML = createMarkupCurrentCityForecast(
+      data.forecast.forecastday
+    );
   } catch (err) {
     console.log(err.message);
   }
 }
 
-searchForm.addEventListener('submit', handleSubmit);
+searchForm.addEventListener('submit', handleSearch);
