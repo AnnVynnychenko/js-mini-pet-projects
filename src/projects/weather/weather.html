@@ -26,12 +26,20 @@
             name="forecastDays"
           ></select>
         </form>
-        <section class="current-city-weather">
-          <div class="js-weather-today"></div>
-          <ul class="js-city-forecast"></ul>
+        <section class="current-city-weather js-weather-forecast-section">
+          <div class="js-weather-today-container"></div>
+          <ul class="js-city-forecast-container"></ul>
         </section>
         <section class="favorites-cities"></section>
       </main>
+    </div>
+    <div class="backdrop is-hidden js-modal-backdrop">
+      <div class="modal">
+        <button type="button" class="modal-close-btn js-modal-close-btn">
+          ✕
+        </button>
+        <div class="js-modal-content"></div>
+      </div>
     </div>
     <script type="module" src="./app-weather.js"></script>
   </body>
