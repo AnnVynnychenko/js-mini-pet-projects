@@ -33,14 +33,14 @@ function templateMarkupForecast(
   humidity,
   dateUnixTime
 ) {
-  return `<img src="${icon}" alt="${text}" />
-      <p>${text}</p>
-      <h3>${date}</h3>
-      <h4>Average temperature</h4>
-      <p>${temperature}°C</p>
-      <h4>Average humidity</h4>
-      <p>${humidity}%</p>
-      <button type="button" class='js-btn-more-info' data-id=${dateUnixTime}>More information</button>`;
+  return `<img src="${icon}" alt="${text}" class="weather-img" />
+      <p class="weather-img-description">${text}</p>
+      <h3 class="forecast-data">${date}</h3>
+      <h4 class="forecast-title-temperature">Average temperature</h4>
+      <p class="forecast-temperature">${temperature}°C</p>
+      <h4 class="forecast-title-humidity">Average humidity</h4>
+      <p class="forecast-humidity">${humidity}%</p>
+      <button type="button" class='button-general more-info-btn js-btn-more-info' data-id=${dateUnixTime}>More information</button>`;
 }
 
 function createMarkupCurrentCity(
@@ -53,8 +53,8 @@ function createMarkupCurrentCity(
     last_updated_epoch,
   }
 ) {
-  return `<h2>${name}</h2>
-  <button type="button" class="js-add-favorites-btn">Add to favorites</button>
+  return `<h2 class='weather-today-title'>${name}</h2>
+  <button type="button" class="button-general add-favorites-btn js-add-favorites-btn">Add to favorites</button>
   ${templateMarkupForecast(icon, text, last_updated, temp_c, humidity, last_updated_epoch)}
   `;
 }
@@ -80,7 +80,7 @@ function createMarkupCurrentCityForecast(data) {
 
 function createMarkupDays() {
   let markup = '';
-  for (let i = 1; i <= 14; i += 1) {
+  for (let i = 1; i <= 3; i += 1) {
     markup += `<option data-id="${i}">${i}</option>`;
   }
   return markup;
@@ -143,8 +143,8 @@ function createFavoritesMarkup(cities) {
       ({ id, cityName }) => `
       <div class="js-city-card" data-id=${id} data-name=${cityName}>
         <h3>${cityName}</h3>
-        <button type="button" class="js-city-forecast-btn">Weather forecast</button>
-        <button type="button" class="js-city-delete-btn">Delete city</button>
+        <button type="button" class="button-general js-city-forecast-btn">Weather forecast</button>
+        <button type="button" class="button-general js-city-delete-btn">Delete city</button>
       </div>
       `
     )
@@ -208,10 +208,10 @@ async function handleForecastFromCityCard(event) {
   const cityCard = target.closest('.js-city-card');
   if (!cityCard) return;
 
-  const cityName = cityCard.dataset.name;
+  const cityName = cityCard.dataset.name.trim().toLowerCase();
   const cityId = cityCard.dataset.id;
 
-  const enteredDays = Number(favoritesCitiesDaysContainer.value) || 1;
+  const enteredDays = Number(favoritesCitiesDaysContainer.value.trim()) || 1;
 
   if (target.classList.contains('js-city-forecast-btn')) {
     await getWeather(cityName, enteredDays);
@@ -304,6 +304,7 @@ async function getWeather(enteredCity, enteredDays) {
 
     const data = await response.json();
     currentWeatherData = data;
+    console.log(currentWeatherData);
 
     weatherTodayContainer.innerHTML = createMarkupCurrentCity(
       data.location,
