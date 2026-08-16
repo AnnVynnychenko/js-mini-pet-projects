@@ -1,4 +1,5 @@
 const BASE_URL = 'https://api.weatherapi.com/v1';
+const MOCK_API_URL = 'https://6a7f1b5f3183f5fd884ae2ce.mockapi.io/api/w';
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 
 let currentWeatherData = {};
@@ -18,6 +19,11 @@ const weatherForecastSection = document.querySelector(
 );
 const modalBackdrop = document.querySelector('.js-modal-backdrop');
 const modalContent = document.querySelector('.js-modal-content');
+const favoritesCityCards = document.querySelector('.js-favorites-city-cards');
+const favoritesCitiesDaysContainer = document.querySelector(
+  '.js-favorites-cities-days-container'
+);
+const favoritesCitiesContainer = document.querySelector('.js-favorites-cities');
 
 function templateMarkupForecast(
   icon,
@@ -48,7 +54,7 @@ function createMarkupCurrentCity(
   }
 ) {
   return `<h2>${name}</h2>
-  <button type="button">Add to favorites</button>
+  <button type="button" class="js-add-favorites-btn">Add to favorites</button>
   ${templateMarkupForecast(icon, text, last_updated, temp_c, humidity, last_updated_epoch)}
   `;
 }
@@ -77,8 +83,11 @@ function createMarkupDays() {
   for (let i = 1; i <= 14; i += 1) {
     markup += `<option data-id="${i}">${i}</option>`;
   }
-  forecastDaysContainer.innerHTML = markup;
+  return markup;
 }
+
+forecastDaysContainer.innerHTML = createMarkupDays();
+favoritesCitiesDaysContainer.innerHTML = createMarkupDays();
 
 function normalizeModalData(rawDayData) {
   if (rawDayData.hasOwnProperty('last_updated_epoch')) {
@@ -125,6 +134,23 @@ function createModalMarkup(data) {
 
 createMarkupDays();
 
+function createFavoritesMarkup(cities) {
+  if (!cities || !cities.length) {
+    return `<p class="empty-msg">You haven't added any favorite cities yet.</p>`;
+  }
+  return cities
+    .map(
+      ({ id, cityName }) => `
+      <div class="js-city-card" data-id=${id} data-name=${cityName}>
+        <h3>${cityName}</h3>
+        <button type="button" class="js-city-forecast-btn">Weather forecast</button>
+        <button type="button" class="js-city-delete-btn">Delete city</button>
+      </div>
+      `
+    )
+    .join('');
+}
+
 function findSelectedDay(selectedDayId) {
   const { current, forecast } = currentWeatherData;
   if (current.last_updated_epoch === selectedDayId) {
@@ -155,6 +181,47 @@ function onWeatherInfoClick(event) {
   window.addEventListener('keydown', handleEscKeyPress);
 }
 
+async function displayFavoritesCitiesMarkup() {
+  try {
+    const cities = await getFavoritesCities();
+    favoritesCityCards.innerHTML = createFavoritesMarkup(cities);
+  } catch (err) {
+    console.error(err.message);
+  }
+}
+
+displayFavoritesCitiesMarkup();
+
+async function handleForecastFromCityCard(event) {
+  const { target } = event;
+
+  const cityCardsBtnClasses = [
+    'js-city-forecast-btn',
+    'js-city-delete-btn',
+    'js-favorites-cities-days-container',
+  ];
+  const hasClass = cityCardsBtnClasses.some(element =>
+    target.classList.contains(element)
+  );
+  if (!hasClass) return;
+
+  const cityCard = target.closest('.js-city-card');
+  if (!cityCard) return;
+
+  const cityName = cityCard.dataset.name;
+  const cityId = cityCard.dataset.id;
+
+  const enteredDays = Number(favoritesCitiesDaysContainer.value) || 1;
+
+  if (target.classList.contains('js-city-forecast-btn')) {
+    await getWeather(cityName, enteredDays);
+  }
+
+  if (target.classList.contains('js-city-delete-btn')) {
+    await deleteFavoriteCity(cityId);
+  }
+}
+
 function handleModalClose(event) {
   const { target } = event;
   if (
@@ -170,8 +237,62 @@ function handleSearch(event) {
   const enteredCity = event.currentTarget.elements.cityName.value
     .trim()
     .toLowerCase();
-  const enteredDays = event.currentTarget.elements.forecastDays.value.trim();
+  const enteredDays =
+    Number(event.currentTarget.elements.forecastDays.value.trim()) || 1;
   getWeather(enteredCity, enteredDays);
+}
+
+async function handleAddToFavoritesCity(event) {
+  const { target } = event;
+  if (!target.classList.contains('js-add-favorites-btn')) return;
+  const targetCity = currentWeatherData.location.name;
+  try {
+    await addFavoritesCity(targetCity);
+    await displayFavoritesCitiesMarkup();
+  } catch (err) {
+    console.error(err.message);
+  }
+}
+
+async function getFavoritesCities() {
+  const response = await fetch(`${MOCK_API_URL}/favoriteCityName`);
+  if (!response.ok) throw new Error(response.statusText);
+  return await response.json();
+}
+
+async function addFavoritesCity(targetCity) {
+  const dataToSend = {
+    cityName: targetCity,
+  };
+  const options = {
+    method: 'POST',
+    body: JSON.stringify(dataToSend),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  const response = await fetch(`${MOCK_API_URL}/favoriteCityName`, options);
+  if (!response.ok) throw new Error(response.statusText);
+  return await response.json();
+}
+
+async function deleteFavoriteCity(id) {
+  try {
+    const options = {
+      method: 'DELETE',
+    };
+
+    const response = await fetch(
+      `${MOCK_API_URL}/favoriteCityName/${id}`,
+      options
+    );
+
+    if (!response.ok) throw new Error(response.statusText);
+
+    await displayFavoritesCitiesMarkup();
+  } catch (err) {
+    console.error(err.message);
+  }
 }
 
 async function getWeather(enteredCity, enteredDays) {
@@ -179,9 +300,8 @@ async function getWeather(enteredCity, enteredDays) {
     const response = await fetch(
       `${BASE_URL}/forecast.json?key=${API_KEY}&q=${enteredCity}&days=${enteredDays}`
     );
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
+    if (!response.ok) throw new Error(response.statusText);
+
     const data = await response.json();
     currentWeatherData = data;
 
@@ -193,10 +313,12 @@ async function getWeather(enteredCity, enteredDays) {
       data.forecast.forecastday
     );
   } catch (err) {
-    console.log(err.message);
+    console.error(err.message);
   }
 }
 
 searchForm.addEventListener('submit', handleSearch);
 weatherForecastSection.addEventListener('click', onWeatherInfoClick);
 modalBackdrop.addEventListener('click', handleModalClose);
+weatherTodayContainer.addEventListener('click', handleAddToFavoritesCity);
+favoritesCitiesContainer.addEventListener('click', handleForecastFromCityCard);
