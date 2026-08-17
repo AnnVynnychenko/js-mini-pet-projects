@@ -24,6 +24,9 @@ const favoritesCitiesDaysContainer = document.querySelector(
   '.js-favorites-cities-days-container'
 );
 const favoritesCitiesContainer = document.querySelector('.js-favorites-cities');
+const favoritesDaysWrapper = document.querySelector(
+  '.js-favorites-days-wrapper'
+);
 
 function templateMarkupForecast(
   icon,
@@ -71,7 +74,7 @@ function createMarkupCurrentCityForecast(data) {
         },
         date_epoch,
       }) => {
-        return `<li>${templateMarkupForecast(icon, text, date, avgtemp_c, avghumidity, date_epoch)}</li>`;
+        return `<li class="current-city-forecast">${templateMarkupForecast(icon, text, date, avgtemp_c, avghumidity, date_epoch)}</li>`;
       }
     )
     .slice(1)
@@ -121,9 +124,8 @@ function normalizeModalData(rawDayData) {
 function createModalMarkup(data) {
   const { date, wind, precipitation, chanceOfRain, visibility, uvIndex } =
     normalizeModalData(data);
-  return `<h2>Detailed forecast for ${date}</h2>
-  <div class="modal-detail-info">
-    <p>Date: ${date}</p>
+  return `<h2 class="modal-title">Detailed forecast for ${date}</h2>
+  <div class="modal-forecast-detail-info">
     <p>Wind: ${wind} kph</p>
     <p>Precipitation: ${precipitation} mm</p>
     <p>Chance of rain: ${chanceOfRain}%</p>
@@ -136,15 +138,18 @@ createMarkupDays();
 
 function createFavoritesMarkup(cities) {
   if (!cities || !cities.length) {
+    favoritesDaysWrapper.classList.add('is-collapsed');
     return `<p class="empty-msg">You haven't added any favorite cities yet.</p>`;
+  } else {
+    favoritesDaysWrapper.classList.remove('is-collapsed');
   }
   return cities
     .map(
       ({ id, cityName }) => `
-      <div class="js-city-card" data-id=${id} data-name=${cityName}>
-        <h3>${cityName}</h3>
-        <button type="button" class="button-general js-city-forecast-btn">Weather forecast</button>
-        <button type="button" class="button-general js-city-delete-btn">Delete city</button>
+      <div class="favorite-city-card js-city-card" data-id=${id} data-name=${cityName}>
+        <h3 class="favorite-city-name">${cityName}</h3>
+        <button type="button" class="button-general city-forecast-btn js-city-forecast-btn">Weather forecast</button>
+        <button type="button" class="button-general city-delete-btn js-city-delete-btn">Delete city</button>
       </div>
       `
     )
@@ -304,7 +309,6 @@ async function getWeather(enteredCity, enteredDays) {
 
     const data = await response.json();
     currentWeatherData = data;
-    console.log(currentWeatherData);
 
     weatherTodayContainer.innerHTML = createMarkupCurrentCity(
       data.location,

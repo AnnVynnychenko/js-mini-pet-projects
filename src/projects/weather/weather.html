@@ -24,7 +24,7 @@
           <button class="button-general form-search-btn" type="submit">
             Search
           </button>
-          <label class="form-label-days"
+          <label class="number-of-days"
             >Enter the number of days
             <select
               class="form-days-container js-forecast-days-container"
@@ -35,16 +35,20 @@
         <section
           class="section-container current-city-weather js-weather-forecast-section"
         >
-          <div class="weather-today-container js-weather-today-container"></div>
+          <div class="weather-today-container js-weather-today-container">
+            <p class="empty-msg">You haven't searched for any city yet.</p>
+          </div>
           <ul class="city-forecast-container js-city-forecast-container"></ul>
         </section>
         <section class="section-container js-favorites-cities">
-          <h2>Favorite Cities</h2>
-          <div class="js-favorites-city-cards"></div>
-          <p>Enter the number of days</p>
-          <select
-            class="favorites-cities-days-container js-favorites-cities-days-container"
-          ></select>
+          <h2 class="favorites-cities-title">Favorite Cities</h2>
+          <p class="number-of-days js-favorites-days-wrapper is-collapsed">
+            Enter the number of days
+            <select
+              class="favorites-cities-days-container js-favorites-cities-days-container"
+            ></select>
+          </p>
+          <div class="favorites-city-cards js-favorites-city-cards"></div>
         </section>
       </main>
     </div>

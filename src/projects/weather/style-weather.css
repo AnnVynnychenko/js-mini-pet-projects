@@ -1,4 +1,7 @@
-/* --- Main Containers --- */
+/* ==========================
+      Main Containers
+============================= */
+
 .weather-app-container {
   display: flex;
   flex-direction: column;
@@ -7,13 +10,15 @@
 }
 
 .section-container {
+  padding: 24px;
   background-color: var(--card-bg);
   border-radius: var(--form-border-radius);
-  padding: 24px;
   box-shadow: var(--shadow-sm);
 }
 
-/* --- Search Form --- */
+/* ==========================
+      Search Form
+============================= */
 
 .search-form {
   display: flex;
@@ -46,7 +51,7 @@
   box-shadow: 0 0 0 2px var(--border-transparent);
 }
 
-.form-label-days {
+.number-of-days {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -79,7 +84,9 @@
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="%234d5ae5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>');
 }
 
-/* --- Current City Weather Section --- */
+/* ==========================
+Current City Weather Section
+============================= */
 
 .current-city-weather {
   display: flex;
@@ -105,7 +112,9 @@
   color: var(--result-color);
 }
 
-/* --- Cards & Weather Details --- */
+/* ==========================
+    Cards & Weather Details
+============================= */
 
 .weather-img {
   width: 72px;
@@ -138,7 +147,83 @@
   color: var(--text-color);
 }
 
-/* --- Buttons --- */
+/* ==========================
+        Forecast List
+============================= */
+
+.city-forecast-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.city-forecast-container:has(> :only-child) {
+  grid-template-columns: 1fr;
+}
+
+.current-city-forecast {
+  background-color: var(--app-bg);
+  border: 1px solid var(--line-color);
+  border-radius: var(--form-border-radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: var(--transition);
+}
+
+/* ==========================
+      Favorites Cities
+============================= */
+
+.favorites-cities-title {
+  margin-bottom: 16px;
+  font-size: 22px;
+  color: var(--result-color);
+}
+
+.favorites-city-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.favorite-city-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background-color: var(--app-bg);
+  border: 1px solid var(--line-color);
+  border-radius: var(--form-border-radius);
+  transition: var(--transition);
+}
+
+.favorite-city-card:is(:hover, :focus) {
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.favorite-city-name {
+  font-size: 18px;
+  color: var(--result-color);
+}
+
+.empty-msg {
+  grid-column: 1 / -1;
+  color: var(--placeholder);
+  font-style: italic;
+}
+
+.is-collapsed {
+  display: none;
+}
+
+/* ==========================
+          Buttons
+============================= */
 
 .button-general {
   font-family: inherit;
@@ -184,45 +269,127 @@
   background-color: var(--accent-hover);
 }
 
-/* --- Modal --- */
+.city-forecast-btn {
+  background-color: var(--accent-color);
+  color: var(--btn-text-color);
+}
 
-.backdrop {
+.city-forecast-btn:is(:hover, :focus) {
+  background-color: var(--accent-hover);
+}
+
+.city-delete-btn {
+  background-color: var(--bg--color-reset);
+  color: var(--btn-reset-color);
+  border: 1px solid transparent;
+}
+
+.city-delete-btn:is(:hover, :focus) {
+  background-color: var(--bg-reset-hover);
+  color: var(--btn-text-color);
+  box-shadow: var(--shadow-reset-hover);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 12px;
+  border-radius: 50%;
+  border-color: transparent;
+  background-color: var(--code-text);
+  color: var(--result-color);
+  outline: none;
+}
+
+.modal-close-btn:is(:hover, :focus) {
+  background-color: var(--accent-hover);
+  color: var(--btn-text-color);
+}
+
+/* ==========================
+          Modal
+============================= */
+
+.backdrop {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  transition:
-    opacity 0.3s ease,
-    visibility 0.3s ease;
+  background-color: rgba(46, 47, 66, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  z-index: 999;
 }
 
-.is-hidden {
+.backdrop.is-hidden {
   opacity: 0;
   pointer-events: none;
-  visibility: hidden;
 }
 
 .modal {
   position: relative;
-  background-color: #ffffff;
-  padding: 30px 20px 20px;
-  border-radius: 12px;
-  max-width: 500px;
-  width: 90%;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 430px;
+  padding: 32px 24px 24px;
+  background-color: var(--app-bg);
+  border-radius: var(--form-border-radius);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease;
 }
 
-.modal-close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
+.backdrop.is-hidden .modal {
+  transform: scale(0.9);
+}
+
+.modal-title {
+  margin-bottom: 16px;
+  padding-bottom: 8px;
   font-size: 20px;
-  cursor: pointer;
+  color: var(--result-color);
+  border-bottom: 1px solid var(--line-color);
+}
+
+.modal-forecast-detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-forecast-detail-info p {
+  font-size: 15px;
+  color: var(--text-color);
+}
+
+/* ==========================
+          Responsive
+============================= */
+
+@media (min-width: 900px) {
+  .weather-app-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .section-container {
+    height: 100%;
+  }
+
+  .search-form {
+    grid-column: 1 / -1;
+  }
+
+  .favorites-city-cards {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
 }
