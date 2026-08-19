@@ -26,3 +26,12 @@ export function normalizeModalData(rawDayData) {
     };
   }
 }
+
+export function formatCityName(str) {
+  if (!str) return;
+  return str
+    .trim()
+    .split(' ')
+    .map(word => word.at(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}

@@ -1,4 +1,4 @@
-import { normalizeModalData } from '../helpers/normalizeModalData';
+import { normalizeModalData } from '../helpers/helpers';
 
 /* ==========================
 Markup Forecast (current, future)
@@ -19,7 +19,7 @@ export function templateMarkupForecast(
       <p class="forecast-temperature">${temperature}°C</p>
       <h4 class="forecast-title-humidity">Average humidity</h4>
       <p class="forecast-humidity">${humidity}%</p>
-      <button type="button" class='button-general more-info-btn js-btn-more-info' data-id=${dateUnixTime}>More information</button>`;
+      <button type="button" class='button-general more-info-btn js-btn-more-info' data-id="${dateUnixTime}">More information</button>`;
 }
 
 export function createMarkupCurrentCity(
@@ -100,7 +100,7 @@ export function createFavoritesMarkup(cities, favoritesDaysWrapper) {
   return cities
     .map(
       ({ id, cityName }) => `
-      <div class="favorite-city-card js-city-card" data-id=${id} data-name=${cityName}>
+      <div class="favorite-city-card js-city-card" data-id="${id}" data-name="${cityName}">
         <h3 class="favorite-city-name">${cityName}</h3>
         <button type="button" class="button-general city-forecast-btn js-city-forecast-btn">Weather forecast</button>
         <button type="button" class="button-general city-delete-btn js-city-delete-btn">Delete city</button>

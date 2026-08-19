@@ -4,13 +4,13 @@ import { WeatherApiService } from './api/WeatherApiService';
 import { FavoritesApiService } from './api/FavoritesApiService';
 import { Modal } from './components/Modal';
 import {
-  templateMarkupForecast,
   createMarkupCurrentCity,
   createMarkupCurrentCityForecast,
   createMarkupDays,
   createModalMarkup,
   createFavoritesMarkup,
 } from './templates/markup';
+import { formatCityName } from './helpers/helpers';
 
 class WeatherApp {
   #currentWeatherData = null;
@@ -152,7 +152,8 @@ class WeatherApp {
     try {
       await this.favoritesApi.addFavoritesCity(targetCity);
       await this.displayFavoritesCitiesMarkup();
-      Notify.success('City successfully added!');
+      const capitalizeCityName = formatCityName(targetCity);
+      Notify.success(`City ${capitalizeCityName} successfully added!`);
     } catch (err) {
       console.error(err.message);
       Notify.failure(err.message);
@@ -174,7 +175,6 @@ class WeatherApp {
 
     const cityCard = target.closest('.js-city-card');
     if (!cityCard) return;
-
     const cityName = cityCard.dataset.name.trim().toLowerCase();
     const cityId = cityCard.dataset.id;
     const enteredDays =
@@ -195,6 +195,8 @@ class WeatherApp {
       if (target.classList.contains('js-city-delete-btn')) {
         await this.favoritesApi.deleteFavoriteCity(cityId);
         await this.displayFavoritesCitiesMarkup();
+        const capitalizeCityName = formatCityName(cityName);
+        Notify.success(`City ${capitalizeCityName} successfully deleted!`);
       }
     } catch (err) {
       console.error(err.message);
