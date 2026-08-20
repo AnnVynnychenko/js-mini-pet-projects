@@ -1,7 +1,12 @@
-export function initBackButton(homeUrl = '/') {
+export function initBackButton(homeUrl = import.meta.env.BASE_URL) {
+  const currentPath = window.location.pathname;
+  const basePath = import.meta.env.BASE_URL;
+
   if (
-    window.location.pathname === '/' ||
-    window.location.pathname === '/index.html'
+    currentPath === basePath ||
+    currentPath === `${basePath}.index.html` ||
+    currentPath === '/' ||
+    currentPath === '/index.html'
   )
     return;
 
