@@ -2,6 +2,7 @@ import { filterByCondition } from './modules/filter-rules.js';
 import { sortByCondition } from './modules/sort-rules.js';
 import { excludeOrByKeys } from './modules/exclude-or-rules.js';
 import { excludeAnd } from './modules/exclude-and-rules.js';
+import { initBackButton } from '../../shared/backHomeBtn/backHomeBtn.js';
 
 const filterForm = document.querySelector('.filter-form');
 const jsonInput = document.querySelector('#json-input');
@@ -125,6 +126,8 @@ function resetAll() {
   conditions.value = '';
   isInputChanged = true;
 }
+
+initBackButton();
 
 presetsSection.addEventListener('click', handleClickPresets);
 jsonInput.addEventListener('input', () => (isInputChanged = true));

@@ -1,4 +1,5 @@
 import units from './units-data.json';
+import { initBackButton } from '../../shared/backHomeBtn/backHomeBtn';
 
 const converterForm = document.querySelector('.converter-form');
 const result = document.querySelector('#result');
@@ -32,5 +33,7 @@ function handleSubmit(event) {
 
   result.textContent = `${finalResult.toFixed(2)} ${toUnit}`;
 }
+
+initBackButton();
 
 converterForm.addEventListener('submit', handleSubmit);

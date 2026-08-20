@@ -1,4 +1,5 @@
 import { wins } from './data-wins.js';
+import { initBackButton } from '../../shared/backHomeBtn/backHomeBtn.js';
 
 const container = document.querySelector('.js-content');
 const tableScore = document.querySelector('.js-score');
@@ -142,6 +143,7 @@ function resetGame(nextFirstPlayer) {
   localStorage.setItem('player', player);
 }
 
+initBackButton();
 createMarkupGameField();
 loadStateGame();
 updateScore(scorePlayerX, scorePlayerO);

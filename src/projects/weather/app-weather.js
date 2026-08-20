@@ -11,6 +11,7 @@ import {
   createFavoritesMarkup,
 } from './templates/markup';
 import { formatCityName } from './helpers/helpers';
+import { initBackButton } from '../../shared/backHomeBtn/backHomeBtn';
 
 class WeatherApp {
   #currentWeatherData = null;
@@ -22,6 +23,7 @@ class WeatherApp {
 
     this.#initDOMElements();
     this.init();
+    initBackButton();
   }
 
   #initDOMElements() {

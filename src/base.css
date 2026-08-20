@@ -1,4 +1,6 @@
-/* -------------CUSTOM VARIABLES------------ */
+/* ==========================
+     Custom Variables
+============================= */
 :root {
   --text-color: #434455;
   --btn-text-color: #ffffff;
@@ -30,7 +32,9 @@
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* --------------RESET STYLES-------------- */
+/* ==========================
+     Reset Styles
+============================= */
 
 *,
 *::before,
@@ -81,7 +85,9 @@ textarea {
   border: none;
 }
 
-/* --------------GENERAL STYLES-------------- */
+/* ==========================
+        General Styles
+============================= */
 
 body {
   font-family: 'Roboto', sans-serif;
@@ -106,4 +112,27 @@ body {
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+}
+
+.back-at-home-btn {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--btn-text-color);
+  color: var(--code-bg);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+  outline: none;
+}
+
+.back-at-home-btn:is(:hover, :focus) {
+  transform: scale(1.1);
 }
