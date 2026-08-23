@@ -1,8 +1,6 @@
 import { normalizeModalData } from '../helpers/helpers';
 
-/* ==========================
-Markup Forecast (current, future)
-============================= */
+/* === Markup Forecast (current, future) === */
 
 export function templateMarkupForecast(
   icon,
@@ -57,9 +55,7 @@ export function createMarkupCurrentCityForecast(data) {
     .join('');
 }
 
-/* ==========================
-      Markup Days
-============================= */
+/* === Markup Days === */
 
 export function createMarkupDays() {
   let markup = '';
@@ -69,9 +65,7 @@ export function createMarkupDays() {
   return markup;
 }
 
-/* ==========================
-      Modal Markup
-============================= */
+/* === Modal Markup === */
 
 export function createModalMarkup(data) {
   const { date, wind, precipitation, chanceOfRain, visibility, uvIndex } =
@@ -86,9 +80,7 @@ export function createModalMarkup(data) {
   </div>`;
 }
 
-/* ==========================
-      Favorites City
-============================= */
+/* === Favorites City === */
 
 export function createFavoritesMarkup(cities, favoritesDaysWrapper) {
   if (!cities || !cities.length) {

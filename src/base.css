@@ -1,6 +1,5 @@
-/* ==========================
-     Custom Variables
-============================= */
+/* === Custom Variables === */
+
 :root {
   --text-color: #434455;
   --btn-text-color: #ffffff;
@@ -32,9 +31,7 @@
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ==========================
-     Reset Styles
-============================= */
+/* === Reset Styles === */
 
 *,
 *::before,
@@ -85,9 +82,7 @@ textarea {
   border: none;
 }
 
-/* ==========================
-        General Styles
-============================= */
+/* === General Styles === */
 
 body {
   font-family: 'Roboto', sans-serif;
@@ -112,6 +107,19 @@ body {
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+}
+
+.visually-hidden {
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
 }
 
 .back-at-home-btn {
